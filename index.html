@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krishimitra - Crop Advisory Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%2334d399" width="1200" height="600"/><path fill="%2310b981" d="M0 400c200-50 400-100 600-50s400 100 600 50v200H0z"/><circle fill="%23fbbf24" cx="1000" cy="100" r="60"/><rect fill="%2316a34a" x="100" y="450" width="80" height="100"/><rect fill="%2316a34a" x="300" y="420" width="60" height="130"/><rect fill="%2316a34a" x="500" y="440" width="70" height="110"/><rect fill="%2316a34a" x="700" y="430" width="90" height="120"/><rect fill="%2316a34a" x="900" y="460" width="75" height="90"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .prediction-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #22c55e;
+        }
+        
+        .icon-bg {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b-2 border-green-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-green-600">🌾 Krishimitra</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="text-green-700 hover:text-green-900 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a href="#input-section" class="text-gray-600 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium">Crop Advisory</a>
+                        <a href="#prediction-dashboard" class="text-gray-600 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium">Predictions</a>
+                        <a href="#" class="text-gray-600 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center text-center text-white">
+        <div class="max-w-4xl mx-auto px-4">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                Should I Sell My Crops Now or Wait?
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                Get smart predictions based on market prices, weather, and storage capacity
+            </p>
+            <button onclick="scrollToInput()" class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                Check Now 🚀
+            </button>
+        </div>
+    </section>
+
+
+    <!-- Farmer Input Section -->
+    <section id="input-section" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Get Your Crop Advisory</h2>
+            
+            <div class="bg-gray-50 rounded-2xl p-8 shadow-lg border-2 border-green-200">
+                <form id="cropForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🌾 Crop Name <span class="text-red-500">*</span></label>
+                        <select id="cropName" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-lg" required>
+                            <option value="">Select your crop</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="tomato">Tomato</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="sugarcane">Sugarcane</option>
+                            <option value="maize">Maize</option>
+                            <option value="soybean">Soybean</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📍 Location (District/Mandi) <span class="text-red-500">*</span></label>
+                        <select id="location" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-lg" required>
+                            <option value="">Select location</option>
+                            <option value="punjab-ludhiana">Punjab - Ludhiana</option>
+                            <option value="punjab-nawanshahar">Punjab - Amritsar</option>
+                            <option value="punjab-sbsnagar">Punjab - Nawanshahr</option>
+                            <option value="west-bengal-kolkata">West Bengal - Kolkata</option>
+                            <option value="west-bengal-siliguri">West Bengal - Siliguri</option>
+                            <option value="haryana-karnal">Haryana - Karnal</option>
+                            <option value="up-meerut">UP - Meerut</option>
+                            <option value="mp-indore">MP - Indore</option>
+                            <option value="maharashtra-pune">Maharashtra - Pune</option>
+                            <option value="gujarat-ahmedabad">Gujarat - Ahmedabad</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🏪 Storage Facility <span class="text-red-500">*</span></label>
+                        <select id="storage" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-lg" required>
+                            <option value="">Do you have storage?</option>
+                            <option value="yes">Yes - I can store</option>
+                            <option value="no">No - Need to sell soon</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">⚖️ Quantity (Optional)</label>
+                        <input type="number" id="quantity" placeholder="Enter quantity in quintals" class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-lg">
+                    </div>
+                    
+                    <div class="md:col-span-2 text-center mt-4 space-y-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg mr-4">
+                            Get Basic Prediction 🔮
+                        </button>
+                        <button type="button" id="advancedPredictionBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            Get Advanced Predictions 🚀
+                        </button>
+                    </div>
+                    
+                    <div class="md:col-span-2 mt-4">
+                        <p class="text-sm text-gray-600 text-center">
+                            <span class="text-red-500">*</span> Required fields. Fill in crop name, location, and storage facility to get predictions.
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Prediction Dashboard -->
+    <section id="prediction-dashboard" class="py-16 bg-gradient-to-br from-purple-50 to-blue-50" style="display: none;">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">🔮 Advanced Crop Selling Predictions</h2>
+            <p class="text-center text-gray-600 mb-12">AI-powered analysis of market trends and future price predictions</p>
+            
+            <!-- Prediction Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-green-200">
+                    <div class="text-center">
+                        <div id="predictionSignal" class="text-4xl mb-2">🟢</div>
+                        <h3 id="predictionTitle" class="text-lg font-bold text-green-700">SELL NOW</h3>
+                        <p id="predictionConfidence" class="text-sm text-gray-600">Confidence: 85%</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-blue-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="currentMarketPrice">₹3,500</div>
+                        <p class="text-sm text-gray-600">Current Market Price</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-yellow-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-yellow-600" id="predictedPrice">₹3,800</div>
+                        <p class="text-sm text-gray-600">Predicted Price (7 days)</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="profitPotential">+₹300</div>
+                        <p class="text-sm text-gray-600">Potential Profit</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Analysis -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Market Trend Analysis -->
+                <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-indigo-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📈 Market Trend Analysis</h3>
+                    <div id="trendAnalysis" class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="text-sm font-medium">Price Trend</span>
+                            <span class="text-green-600 font-bold">↗️ Rising (+8.5%)</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="text-sm font-medium">Market Demand</span>
+                            <span class="text-blue-600 font-bold">📈 High</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                            <span class="text-sm font-medium">Supply Level</span>
+                            <span class="text-yellow-600 font-bold">⚖️ Moderate</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                            <span class="text-sm font-medium">Seasonal Factor</span>
+                            <span class="text-purple-600 font-bold">🌾 Peak Season</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Risk Assessment -->
+                <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-red-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">⚠️ Risk Assessment</h3>
+                    <div id="riskAnalysis" class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                            <span class="text-sm font-medium">Weather Risk</span>
+                            <span class="text-red-600 font-bold">🔴 High (Rain expected)</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                            <span class="text-sm font-medium">Price Volatility</span>
+                            <span class="text-yellow-600 font-bold">🟡 Medium</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="text-sm font-medium">Storage Risk</span>
+                            <span class="text-green-600 font-bold">🟢 Low</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="text-sm font-medium">Market Access</span>
+                            <span class="text-blue-600 font-bold">🔵 Good</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prediction Timeline -->
+            <div class="mt-8 bg-white rounded-xl p-6 shadow-lg border-2 border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">📅 7-Day Price Prediction Timeline</h3>
+                <canvas id="predictionChart" width="800" height="300"></canvas>
+            </div>
+            
+            <!-- AI Recommendations -->
+            <div class="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 shadow-lg border-2 border-green-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">🤖 AI Recommendations</h3>
+                <div id="aiRecommendations" class="space-y-3">
+                    <div class="flex items-start space-x-3 p-3 bg-white rounded-lg">
+                        <span class="text-green-600 font-bold">✅</span>
+                        <p class="text-sm text-gray-700">Sell within the next 2-3 days to maximize profit potential</p>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 bg-white rounded-lg">
+                        <span class="text-yellow-600 font-bold">⚠️</span>
+                        <p class="text-sm text-gray-700">Monitor weather forecasts closely - rain expected in 4 days</p>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 bg-white rounded-lg">
+                        <span class="text-blue-600 font-bold">💡</span>
+                        <p class="text-sm text-gray-700">Consider selling in batches to take advantage of price fluctuations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prediction Result Section -->
+    <section id="result-section" class="py-16 bg-gray-50" style="display: none;">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Your Crop Advisory Result</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Recommendation -->
+                <div class="prediction-card rounded-2xl p-6 shadow-xl">
+                    <div class="text-center">
+                        <div id="recommendation" class="text-5xl mb-4">🟢</div>
+                        <h3 id="recommendationText" class="text-xl font-bold text-green-700 mb-3">Sell Now</h3>
+                        <p id="recommendationReason" class="text-gray-700 text-sm mb-4">
+                            Current prices are favorable and weather conditions are stable. Good time to sell!
+                        </p>
+                        <div class="p-3 bg-white rounded-lg">
+                            <p class="text-xs text-gray-600">Current Price</p>
+                            <p id="currentPrice" class="text-xl font-bold text-green-600">₹2,150/quintal</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Weather Prediction -->
+                <div class="bg-blue-50 border-2 border-blue-300 rounded-2xl p-6 shadow-xl">
+                    <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">🌤️ Weather Forecast</h3>
+                    <div id="weatherInfo" class="space-y-3">
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="text-sm">Today</span>
+                            <span class="text-2xl">☀️</span>
+                            <span class="text-sm font-semibold">28°C</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="text-sm">Tomorrow</span>
+                            <span class="text-2xl">⛅</span>
+                            <span class="text-sm font-semibold">26°C</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="text-sm">Day 3</span>
+                            <span class="text-2xl">🌧️</span>
+                            <span class="text-sm font-semibold">24°C</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
+                        <p class="text-xs text-yellow-800 font-semibold">⚠️ Rain expected in 3 days</p>
+                        <p class="text-xs text-yellow-700">Consider harvesting soon</p>
+                    </div>
+                </div>
+                
+                <!-- Price Trend Chart -->
+                <div class="bg-white border-2 border-green-200 rounded-2xl p-6 shadow-xl">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4 text-center">📈 Price Trend</h4>
+                    <canvas id="priceChart" width="300" height="200"></canvas>
+                    <div class="mt-3 text-center">
+                        <p class="text-xs text-gray-600">Last 7 days + Next 7 days</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">How It Works</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="icon-bg w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-3xl">📊</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Collect Information</h3>
+                    <p class="text-gray-600">We gather your crop details, location, and storage capacity</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="icon-bg w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-3xl">🌤️</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Analyze Data</h3>
+                    <p class="text-gray-600">Fetch real-time mandi prices, weather forecasts, and market trends</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="icon-bg w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-3xl">🎯</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Smart Prediction</h3>
+                    <p class="text-gray-600">AI-powered recommendations for the best time to sell your crops</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Multilingual Chatbot -->
+    <div id="chatbot" class="fixed bottom-6 right-6 z-50">
+        <!-- Chat Toggle Button -->
+        <button id="chatToggle" class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110">
+            <span class="text-2xl">💬</span>
+        </button>
+        
+        <!-- Chat Window -->
+        <div id="chatWindow" class="hidden absolute bottom-16 right-0 w-80 bg-white rounded-2xl shadow-2xl border-2 border-green-200 overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-green-600 text-white p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold">🤖 krishimitra Assistant</h3>
+                    <p class="text-xs opacity-90">Ask me anything in your language</p>
+                </div>
+                <div class="flex space-x-2">
+                    <select id="languageSelect" class="bg-green-700 text-white text-xs rounded px-2 py-1 border-none">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="pa">ਪੰਜਾਬੀ</option>
+                        <option value="gu">ગુજરાતી</option>
+                        <option value="mr">मराठी</option>
+                        <option value="ta">தமிழ்</option>
+                    </select>
+                    <button id="chatClose" class="text-white hover:text-gray-200">✕</button>
+                </div>
+            </div>
+            
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="h-64 overflow-y-auto p-4 space-y-3 bg-gray-50">
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <p class="text-sm text-green-800" id="welcomeMessage">
+                        Hello! I'm your farming assistant. Ask me about crop prices, weather, or farming tips. 🌾
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex space-x-2">
+                    <input type="text" id="chatInput" placeholder="Type your question..." class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 text-sm">
+                    <button id="chatSend" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                        Send
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-1 mt-2">
+                    <button class="quick-question bg-gray-200 hover:bg-gray-300 text-xs px-2 py-1 rounded text-gray-700" data-question="What is the current wheat price?">Wheat Price</button>
+                    <button class="quick-question bg-gray-200 hover:bg-gray-300 text-xs px-2 py-1 rounded text-gray-700" data-question="Will it rain tomorrow?">Weather</button>
+                    <button class="quick-question bg-gray-200 hover:bg-gray-300 text-xs px-2 py-1 rounded text-gray-700" data-question="Best time to harvest rice?">Harvest Tips</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-green-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">🌾 Krishimitra</h3>
+                    <p class="text-green-200">Empowering farmers with smart crop advisory and market insights.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-green-200 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-green-200 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="text-green-200 hover:text-white transition-colors">Help Center</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Data Sources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-green-200 hover:text-white transition-colors">Agmarknet</a></li>
+                        <li><a href="#" class="text-green-200 hover:text-white transition-colors">OpenWeather</a></li>
+                        <li><a href="#" class="text-green-200 hover:text-white transition-colors">Govt MSP</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Contact Info</h4>
+                    <p class="text-green-200 mb-2">📞 1800-123-FARM</p>
+                    <p class="text-green-200 mb-2">📧 help@krishimitra.in</p>
+                    <p class="text-green-200">🏢 New Delhi, India</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-green-700 mt-8 pt-8 text-center">
+                <p class="text-green-200">&copy; 2024 Krishimitra. Made with ❤️ for Indian Farmers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function scrollToInput() {
+            document.getElementById('input-section').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        document.getElementById('cropForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const cropName = document.getElementById('cropName').value;
+            const location = document.getElementById('location').value;
+            const storage = document.getElementById('storage').value;
+            
+            if (!cropName || !location || !storage) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Simulate prediction logic with weather integration
+            const weatherConditions = [
+                { days: ['☀️', '⛅', '🌧️'], temps: ['28°C', '26°C', '24°C'], alert: 'Rain expected in 3 days', alertType: 'warning' },
+                { days: ['☀️', '☀️', '⛅'], temps: ['30°C', '32°C', '29°C'], alert: 'Clear weather ahead', alertType: 'good' },
+                { days: ['🌧️', '⛅', '☀️'], temps: ['22°C', '25°C', '27°C'], alert: 'Rain today, clearing up', alertType: 'caution' }
+            ];
+            
+            const randomWeather = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
+            
+            const predictions = [
+                { signal: '🟢', text: 'Sell Now', reason: 'Current prices are favorable and weather conditions are stable. Good time to sell!', price: '₹2,150' },
+                { signal: '🟡', text: 'Wait', reason: 'Prices may increase in the next few days. Consider waiting if you have storage.', price: '₹1,980' },
+                { signal: '🔴', text: 'Urgent Sell', reason: 'Weather forecast shows rain. Sell immediately to avoid quality loss!', price: '₹1,850' }
+            ];
+            
+            const randomPrediction = predictions[Math.floor(Math.random() * predictions.length)];
+            
+            // Update result section
+            document.getElementById('recommendation').textContent = randomPrediction.signal;
+            document.getElementById('recommendationText').textContent = randomPrediction.text;
+            document.getElementById('recommendationReason').textContent = randomPrediction.reason;
+            document.getElementById('currentPrice').textContent = randomPrediction.price + '/quintal';
+            
+            // Update weather section
+            updateWeatherDisplay(randomWeather);
+            
+            // Show result section
+            document.getElementById('result-section').style.display = 'block';
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+            
+            // Create price trend chart
+            createPriceChart();
+        });
+
+        function updateWeatherDisplay(weather) {
+            const weatherInfo = document.getElementById('weatherInfo');
+            const days = ['Today', 'Tomorrow', 'Day 3'];
+            
+            weatherInfo.innerHTML = '';
+            
+            weather.days.forEach((icon, index) => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'flex justify-between items-center p-2 bg-white rounded';
+                dayDiv.innerHTML = `
+                    <span class="text-sm">${days[index]}</span>
+                    <span class="text-2xl">${icon}</span>
+                    <span class="text-sm font-semibold">${weather.temps[index]}</span>
+                `;
+                weatherInfo.appendChild(dayDiv);
+            });
+            
+            // Update weather alert
+            const alertDiv = weatherInfo.parentElement.querySelector('.bg-yellow-100');
+            const alertColor = weather.alertType === 'good' ? 'bg-green-100' : weather.alertType === 'warning' ? 'bg-red-100' : 'bg-yellow-100';
+            const alertTextColor = weather.alertType === 'good' ? 'text-green-800' : weather.alertType === 'warning' ? 'text-red-800' : 'text-yellow-800';
+            
+            alertDiv.className = `mt-4 p-3 rounded-lg ${alertColor}`;
+            alertDiv.innerHTML = `
+                <p class="text-xs font-semibold ${alertTextColor}">⚠️ ${weather.alert}</p>
+                <p class="text-xs ${alertTextColor.replace('800', '700')}">Plan your harvest accordingly</p>
+            `;
+        }
+
+        function createPriceChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // Generate sample price data
+            const pastPrices = [1950, 1980, 2020, 1990, 2050, 2100, 2150];
+            const futurePrices = [2180, 2200, 2250, 2300, 2280, 2320, 2350];
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['-7d', '-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today', '+1d', '+2d', '+3d', '+4d', '+5d', '+6d', '+7d'],
+                    datasets: [{
+                        label: 'Price (₹/quintal)',
+                        data: [...pastPrices, ...futurePrices],
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: function(context) {
+                            return context.dataIndex === 7 ? '#fbbf24' : '#22c55e';
+                        },
+                        pointBorderColor: function(context) {
+                            return context.dataIndex === 7 ? '#f59e0b' : '#16a34a';
+                        },
+                        pointRadius: function(context) {
+                            return context.dataIndex === 7 ? 8 : 4;
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chatbot functionality
+        const chatToggle = document.getElementById('chatToggle');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatClose = document.getElementById('chatClose');
+        const chatSend = document.getElementById('chatSend');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const languageSelect = document.getElementById('languageSelect');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+
+        // Language translations
+        const translations = {
+            en: {
+                welcome: "Hello! I'm your farming assistant. Ask me about crop prices, weather, or farming tips. 🌾",
+                placeholder: "Type your question...",
+                send: "Send"
+            },
+            hi: {
+                welcome: "नमस्ते! मैं आपका कृषि सहायक हूं। फसल की कीमतों, मौसम या खेती की सलाह के बारे में पूछें। 🌾",
+                placeholder: "अपना प्रश्न लिखें...",
+                send: "भेजें"
+            },
+            pa: {
+                welcome: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ ਹਾਂ। ਫਸਲਾਂ ਦੀਆਂ ਕੀਮਤਾਂ, ਮੌਸਮ ਜਾਂ ਖੇਤੀ ਦੀਆਂ ਸਲਾਹਾਂ ਬਾਰੇ ਪੁੱਛੋ। 🌾",
+                placeholder: "ਆਪਣਾ ਸਵਾਲ ਲਿਖੋ...",
+                send: "ਭੇਜੋ"
+            },
+            gu: {
+                welcome: "નમસ્તે! હું તમારો ખેતી સહાયક છું. પાકની કીਮਤો, હવામાન અથવા ખેતીની સલਾહ વિશે ોપુੱਛો. 🌾",
+                placeholder: "તમારો પ્રશ્ન લખો...",
+                send: "મોકલો"
+            },
+            mr: {
+                welcome: "નમસ્કાર! મૈ તમચો શેતી સહાયક આહે. પિકાંચો કીਮਤો, હવામાન અથવા શેતીની સલਾહ વિશે વિચારો. 🌾",
+                placeholder: "તમચો પ્રશ્ન લખો...",
+                send: "પાઠવો"
+            },
+            ta: {
+                welcome: "வணக்கம்! நான் உங்கள் விவசாய உதவியாளர். பயிர் விலைகள், வானிலை அல்லது விவசாய ஆலோசனைகள் பற்றி கேளுங்கள். 🌾",
+                placeholder: "உங்கள் கேள்வியை தட்டச்சு செய்யுங்கள்...",
+                send: "அனுப்பு"
+            }
+        };
+
+        // Sample responses for different topics
+        const responses = {
+            price: [
+                "Current wheat price is around ₹2,150 per quintal in major mandis. Prices are stable with slight upward trend.",
+                "Rice prices vary by variety: Basmati ₹3,500-4,000, Regular ₹2,000-2,300 per quintal.",
+                "Cotton prices are at ₹6,200-6,500 per quintal. Good demand from textile mills."
+            ],
+            weather: [
+                "Weather forecast shows clear skies for next 3 days, good for harvesting activities.",
+                "Light rain expected in 2-3 days. Plan your field activities accordingly.",
+                "Temperature will be 25-30°C this week, ideal for most crop activities."
+            ],
+            farming: [
+                "For better yield, ensure proper spacing between plants and regular watering.",
+                "Use organic fertilizers for sustainable farming and better soil health.",
+                "Monitor your crops for pests regularly, especially during monsoon season."
+            ],
+            general: [
+                "I can help you with crop prices, weather updates, and farming advice. What would you like to know?",
+                "Feel free to ask about market trends, best practices, or any farming-related questions.",
+                "I'm here to assist with your agricultural needs. How can I help you today?"
+            ]
+        };
+
+        chatToggle.addEventListener('click', () => {
+            chatWindow.classList.toggle('hidden');
+        });
+
+        chatClose.addEventListener('click', () => {
+            chatWindow.classList.add('hidden');
+        });
+
+        languageSelect.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            const translation = translations[lang];
+            welcomeMessage.textContent = translation.welcome;
+            chatInput.placeholder = translation.placeholder;
+            chatSend.textContent = translation.send;
+        });
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isUser ? 'bg-green-600 text-white p-3 rounded-lg ml-8' : 'bg-gray-200 p-3 rounded-lg mr-8';
+            messageDiv.innerHTML = `<p class="text-sm">${message}</p>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getBotResponse(question) {
+            const lowerQuestion = question.toLowerCase();
+            
+            if (lowerQuestion.includes('price') || lowerQuestion.includes('cost') || lowerQuestion.includes('rate')) {
+                return responses.price[Math.floor(Math.random() * responses.price.length)];
+            } else if (lowerQuestion.includes('weather') || lowerQuestion.includes('rain') || lowerQuestion.includes('temperature')) {
+                return responses.weather[Math.floor(Math.random() * responses.weather.length)];
+            } else if (lowerQuestion.includes('harvest') || lowerQuestion.includes('farming') || lowerQuestion.includes('crop') || lowerQuestion.includes('fertilizer')) {
+                return responses.farming[Math.floor(Math.random() * responses.farming.length)];
+            } else {
+                return responses.general[Math.floor(Math.random() * responses.general.length)];
+            }
+        }
+
+        chatSend.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                chatInput.value = '';
+                
+                // Simulate bot response delay
+                setTimeout(() => {
+                    const response = getBotResponse(message);
+                    addMessage(response);
+                }, 1000);
+            }
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                chatSend.click();
+            }
+        });
+
+        // Quick question buttons
+        document.querySelectorAll('.quick-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const question = button.dataset.question;
+                addMessage(question, true);
+                
+                setTimeout(() => {
+                    const response = getBotResponse(question);
+                    addMessage(response);
+                }, 1000);
+            });
+        });
+
+        // Google Sheets Data Integration (Background Loading)
+        let sheetsData = [];
+        let filteredData = [];
+
+        // Sample data based on your Google Sheets structure
+        const sampleData = [
+            { state: "West Bengal", district: "Birbhum", market: "Sainthia", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3450, max_price: 3550, modal_price: 3500 },
+            { state: "West Bengal", district: "Dakshin Dinajpur", market: "Balurghat", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3600, max_price: 3700, modal_price: 3650 },
+            { state: "West Bengal", district: "Jhargram", market: "Jhargram", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3600, max_price: 4000, modal_price: 3800 },
+            { state: "West Bengal", district: "Jhargram", market: "Jhargram", commodity: "Rice", variety: "Super Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4800, max_price: 5200, modal_price: 5000 },
+            { state: "West Bengal", district: "Murshidabad", market: "Beldanga", commodity: "Rice", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3500, max_price: 3550, modal_price: 3520 },
+            { state: "West Bengal", district: "Paschim Bardhaman", market: "Durgapur", commodity: "Rice", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3050, max_price: 3200, modal_price: 3150 },
+            { state: "West Bengal", district: "Bankura", market: "Bankura Sadar", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3300, max_price: 3500, modal_price: 3400 },
+            { state: "West Bengal", district: "Bankura", market: "Khatra", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3500, max_price: 3700, modal_price: 3600 },
+            { state: "West Bengal", district: "Birbhum", market: "Birbhum", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3450, max_price: 3550, modal_price: 3500 },
+            { state: "West Bengal", district: "Birbhum", market: "Bolpur", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3450, max_price: 3550, modal_price: 3500 },
+            { state: "West Bengal", district: "Darjeeling", market: "Siliguri", commodity: "Rice", variety: "Fine(Basmati)", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4600, max_price: 4800, modal_price: 4700 },
+            { state: "West Bengal", district: "Paschim Bardhaman", market: "Durgapur", commodity: "Rice", variety: "Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4450, max_price: 4600, modal_price: 4500 },
+            { state: "West Bengal", district: "Birbhum", market: "Rampurhat", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3400, max_price: 3500, modal_price: 3450 },
+            { state: "West Bengal", district: "Howrah", market: "Uluberia", commodity: "Rice", variety: "Sona Mansoori Non Basmati", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3150, max_price: 3250, modal_price: 3200 },
+            { state: "West Bengal", district: "Jhargram", market: "Jhargram", commodity: "Rice", variety: "Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4200, max_price: 4600, modal_price: 4400 },
+            { state: "West Bengal", district: "Nadia", market: "Kalyani", commodity: "Rice", variety: "Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4600, max_price: 5000, modal_price: 4800 },
+            { state: "West Bengal", district: "Paschim Bardhaman", market: "Asansol", commodity: "Rice", variety: "Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4450, max_price: 4600, modal_price: 4500 },
+            { state: "West Bengal", district: "Sounth 24 Parganas", market: "Baruipur(Canning)", commodity: "Rice", variety: "Common", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3400, max_price: 3500, modal_price: 3450 },
+            { state: "West Bengal", district: "Sounth 24 Parganas", market: "Baruipur(Canning)", commodity: "Rice", variety: "Super Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 5200, max_price: 5300, modal_price: 5250 },
+            { state: "West Bengal", district: "Uttar Dinajpur", market: "Kaliaganj", commodity: "Rice", variety: "Fine", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4000, max_price: 4200, modal_price: 4100 },
+            { state: "West Bengal", district: "Howrah", market: "Uluberia", commodity: "Rice", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3300, max_price: 3500, modal_price: 3400 },
+            { state: "West Bengal", district: "Howrah", market: "Uluberia", commodity: "Tomato", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3000, max_price: 4000, modal_price: 3500 },
+            { state: "West Bengal", district: "Medinipur(W)", market: "Garbeta(Medinipur)", commodity: "Tomato", variety: "Tomato", grade: "FAQ", arrival_date: "24/09/2025", min_price: 4000, max_price: 4400, modal_price: 4200 },
+            { state: "West Bengal", district: "Birbhum", market: "Bolpur", commodity: "Tomato", variety: "Tomato", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3600, max_price: 3800, modal_price: 3700 },
+            { state: "West Bengal", district: "Darjeeling", market: "Siliguri", commodity: "Tomato", variety: "Hybrid", grade: "FAQ", arrival_date: "24/09/2025", min_price: 2800, max_price: 3000, modal_price: 2900 },
+            { state: "West Bengal", district: "Medinipur(W)", market: "Ghatal", commodity: "Tomato", variety: "Local", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3400, max_price: 3600, modal_price: 3500 },
+            { state: "West Bengal", district: "North 24 Parganas", market: "Barasat", commodity: "Tomato", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3000, max_price: 3000, modal_price: 3000 },
+            { state: "West Bengal", district: "Paschim Bardhaman", market: "Durgapur", commodity: "Tomato", variety: "Hybrid", grade: "FAQ", arrival_date: "24/09/2025", min_price: 2800, max_price: 3200, modal_price: 3050 },
+            { state: "West Bengal", district: "Darjeeling", market: "Karsiyang(Matigara)", commodity: "Tomato", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3800, max_price: 4000, modal_price: 3900 },
+            { state: "West Bengal", district: "Paschim Bardhaman", market: "Asansol", commodity: "Tomato", variety: "Hybrid", grade: "Non-FAQ", arrival_date: "24/09/2025", min_price: 2500, max_price: 2700, modal_price: 2650 },
+            { state: "West Bengal", district: "Puruliya", market: "Balarampur", commodity: "Tomato", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 2800, max_price: 3200, modal_price: 3000 },
+            { state: "West Bengal", district: "Alipurduar", market: "Alipurduar", commodity: "Tomato", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3200, max_price: 3800, modal_price: 3500 },
+            { state: "West Bengal", district: "Darjeeling", market: "Darjeeling", commodity: "Tomato", variety: "Other", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3800, max_price: 4000, modal_price: 3900 },
+            { state: "West Bengal", district: "Hooghly", market: "Pandua", commodity: "Tomato", variety: "Hybrid", grade: "FAQ", arrival_date: "24/09/2025", min_price: 3200, max_price: 3300, modal_price: 3200 },
+            { state: "West Bengal", district: "Paschim Bardhaman", market: "Durgapur", commodity: "Tomato", variety: "Hybrid", grade: "Non-FAQ", arrival_date: "24/09/2025", min_price: 2500, max_price: 2700, modal_price: 2650 }
+        ];
+
+        // Initialize with sample data (automatically loaded)
+        sheetsData = [...sampleData];
+        filteredData = [...sampleData];
+
+        // Auto-update crop advisory with real data when form changes
+        function updateCropAdvisoryWithRealData() {
+            const cropName = document.getElementById('cropName').value;
+            const location = document.getElementById('location').value;
+            
+            if (cropName && location && filteredData.length > 0) {
+                // Find matching data
+                const matchingData = filteredData.filter(item => 
+                    item.commodity.toLowerCase().includes(cropName.toLowerCase())
+                );
+                
+                if (matchingData.length > 0) {
+                    // Calculate average price for the crop
+                    const prices = matchingData.map(item => item.modal_price);
+                    const avgPrice = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+                    
+                    // Update the prediction with real data
+                    document.getElementById('currentPrice').textContent = `₹${avgPrice}/quintal`;
+                    
+                    // Update recommendation based on real data
+                    const priceRange = Math.max(...prices) - Math.min(...prices);
+                    if (priceRange > 500) {
+                        document.getElementById('recommendation').textContent = '🟡';
+                        document.getElementById('recommendationText').textContent = 'Wait';
+                        document.getElementById('recommendationReason').textContent = 'Price variation is high. Consider waiting for better prices.';
+                    } else {
+                        document.getElementById('recommendation').textContent = '🟢';
+                        document.getElementById('recommendationText').textContent = 'Sell Now';
+                        document.getElementById('recommendationReason').textContent = 'Prices are stable. Good time to sell your crop.';
+                    }
+                }
+            }
+        }
+
+        // Auto-update when crop or location changes
+        document.getElementById('cropName').addEventListener('change', updateCropAdvisoryWithRealData);
+        document.getElementById('location').addEventListener('change', updateCropAdvisoryWithRealData);
+
+
+
+        // Advanced Prediction Engine
+        document.getElementById('advancedPredictionBtn').addEventListener('click', function() {
+            const cropName = document.getElementById('cropName').value;
+            const location = document.getElementById('location').value;
+            const storage = document.getElementById('storage').value;
+            const quantity = document.getElementById('quantity').value;
+            
+            // Check if required fields are filled
+            if (!cropName) {
+                alert('Please select a crop name');
+                document.getElementById('cropName').focus();
+                return;
+            }
+            
+            if (!location) {
+                alert('Please select your location');
+                document.getElementById('location').focus();
+                return;
+            }
+            
+            if (!storage) {
+                alert('Please select your storage facility option');
+                document.getElementById('storage').focus();
+                return;
+            }
+            
+            // Show loading state
+            this.innerHTML = '⏳ Analyzing...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                generateAdvancedPredictions(cropName, location, storage, quantity);
+                this.innerHTML = 'Get Advanced Predictions 🚀';
+                this.disabled = false;
+            }, 3000);
+        });
+
+        function generateAdvancedPredictions(cropName, location, storage, quantity) {
+            // Find relevant data from Google Sheets
+            const relevantData = filteredData.filter(item => 
+                item.commodity.toLowerCase().includes(cropName.toLowerCase())
+            );
+            
+            if (relevantData.length === 0) {
+                alert('No data found for the selected crop. Please scan data first.');
+                return;
+            }
+            
+            // Calculate predictions based on real data
+            const predictions = calculateAdvancedPredictions(relevantData, storage, quantity);
+            
+            // Update prediction dashboard
+            updatePredictionDashboard(predictions);
+            
+            // Show prediction dashboard
+            document.getElementById('prediction-dashboard').style.display = 'block';
+            document.getElementById('prediction-dashboard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function calculateAdvancedPredictions(data, storage, quantity) {
+            const prices = data.map(item => item.modal_price);
+            const currentPrice = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+            
+            // Simulate advanced ML predictions
+            const priceVariation = Math.max(...prices) - Math.min(...prices);
+            const avgPrice = currentPrice;
+            
+            // Generate 7-day price predictions
+            const predictions = [];
+            const basePrice = currentPrice;
+            
+            for (let i = 0; i < 7; i++) {
+                // Bias: downward if no storage (more URGENT SELL), slight upward otherwise
+                const baseBias = storage === 'no' ? -0.03 : 0.02;
+                const trend = Math.sin(i * 0.3) * 0.08 + baseBias;
+                const volatility = (Math.random() - 0.5) * (storage === 'no' ? 0.05 : 0.03);
+                const predictedPrice = Math.round(basePrice * (1 + trend + volatility));
+                predictions.push({
+                    day: i + 1,
+                    price: predictedPrice,
+                    confidence: Math.max(60, 95 - i * 5) // Decreasing confidence over time
+                });
+            }
+            
+            // Calculate recommendation
+            const maxPrice = Math.max(...predictions.map(p => p.price));
+            const minPrice = Math.min(...predictions.map(p => p.price));
+            const priceIncrease = maxPrice - currentPrice;
+            const priceDecrease = currentPrice - minPrice;
+            
+            let recommendation = 'SELL NOW';
+            let confidence = 85;
+            let signal = '🟢';
+            
+            // Revised thresholds: easier to trigger URGENT SELL
+            if (priceIncrease > priceDecrease && priceIncrease > 180) {
+                recommendation = 'WAIT';
+                confidence = 75;
+                signal = '🟡';
+            } else if (priceDecrease > 50) {
+                recommendation = 'URGENT SELL';
+                confidence = 90;
+                signal = '🔴';
+            } else {
+                // Default to SELL NOW for most cases
+                recommendation = 'SELL NOW';
+                confidence = 85;
+                signal = '🟢';
+            }
+            
+            // Risk assessment
+            const weatherRisk = Math.random() > 0.7 ? 'High' : 'Low';
+            const volatilityRisk = priceVariation > 500 ? 'High' : 'Medium';
+            
+            return {
+                recommendation,
+                confidence,
+                signal,
+                currentPrice,
+                predictedPrice: predictions[6].price,
+                profitPotential: maxPrice - currentPrice,
+                predictions,
+                riskFactors: {
+                    weather: weatherRisk,
+                    volatility: volatilityRisk,
+                    storage: storage === 'no' ? 'High' : 'Low',
+                    marketAccess: 'Good'
+                },
+                trends: {
+                    priceTrend: priceIncrease > 0 ? 'Rising' : 'Falling',
+                    demand: 'High',
+                    supply: 'Moderate',
+                    seasonal: 'Peak Season'
+                }
+            };
+        }
+
+        function updatePredictionDashboard(predictions) {
+            // Update summary cards
+            document.getElementById('predictionSignal').textContent = predictions.signal;
+            document.getElementById('predictionTitle').textContent = predictions.recommendation;
+            document.getElementById('predictionConfidence').textContent = `Confidence: ${predictions.confidence}%`;
+            document.getElementById('currentMarketPrice').textContent = `₹${predictions.currentPrice}`;
+            document.getElementById('predictedPrice').textContent = `₹${predictions.predictedPrice}`;
+            document.getElementById('profitPotential').textContent = `+₹${predictions.profitPotential}`;
+            
+            // Update trend analysis
+            updateTrendAnalysis(predictions.trends);
+            
+            // Update risk analysis
+            updateRiskAnalysis(predictions.riskFactors);
+            
+            // Create prediction chart
+            createPredictionChart(predictions.predictions);
+            
+            // Update AI recommendations
+            updateAIRecommendations(predictions);
+        }
+
+        function updateTrendAnalysis(trends) {
+            const trendAnalysis = document.getElementById('trendAnalysis');
+            trendAnalysis.innerHTML = `
+                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span class="text-sm font-medium">Price Trend</span>
+                    <span class="text-green-600 font-bold">↗️ ${trends.priceTrend} (+8.5%)</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span class="text-sm font-medium">Market Demand</span>
+                    <span class="text-blue-600 font-bold">📈 ${trends.demand}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                    <span class="text-sm font-medium">Supply Level</span>
+                    <span class="text-yellow-600 font-bold">⚖️ ${trends.supply}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span class="text-sm font-medium">Seasonal Factor</span>
+                    <span class="text-purple-600 font-bold">🌾 ${trends.seasonal}</span>
+                </div>
+            `;
+        }
+
+        function updateRiskAnalysis(riskFactors) {
+            const riskAnalysis = document.getElementById('riskAnalysis');
+            const weatherColor = riskFactors.weather === 'High' ? 'red' : 'green';
+            const volatilityColor = riskFactors.volatility === 'High' ? 'red' : 'yellow';
+            
+            riskAnalysis.innerHTML = `
+                <div class="flex justify-between items-center p-3 bg-${weatherColor}-50 rounded-lg">
+                    <span class="text-sm font-medium">Weather Risk</span>
+                    <span class="text-${weatherColor}-600 font-bold">🔴 ${riskFactors.weather} (Rain expected)</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-${volatilityColor}-50 rounded-lg">
+                    <span class="text-sm font-medium">Price Volatility</span>
+                    <span class="text-${volatilityColor}-600 font-bold">🟡 ${riskFactors.volatility}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span class="text-sm font-medium">Storage Risk</span>
+                    <span class="text-green-600 font-bold">🟢 ${riskFactors.storage}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span class="text-sm font-medium">Market Access</span>
+                    <span class="text-blue-600 font-bold">🔵 ${riskFactors.marketAccess}</span>
+                </div>
+            `;
+        }
+
+        function createPredictionChart(predictions) {
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: predictions.map(p => `Day ${p.day}`),
+                    datasets: [{
+                        label: 'Predicted Price (₹/quintal)',
+                        data: predictions.map(p => p.price),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#7c3aed',
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAIRecommendations(predictions) {
+            const recommendations = document.getElementById('aiRecommendations');
+            let recommendationTexts = [];
+            
+            if (predictions.recommendation === 'SELL NOW') {
+                recommendationTexts = [
+                    '✅ Sell within the next 2-3 days to maximize profit potential',
+                    '✅ Current market conditions are favorable for selling',
+                    '✅ Consider selling in batches to take advantage of price fluctuations',
+                    '✅ Market demand is high - good time to sell your crop'
+                ];
+            } else if (predictions.recommendation === 'WAIT') {
+                recommendationTexts = [
+                    '⏳ Wait for better prices - upward trend expected',
+                    '📈 Monitor market closely for optimal selling opportunity',
+                    '⚖️ Consider partial selling to reduce risk'
+                ];
+            } else {
+                recommendationTexts = [
+                    '🚨 Sell immediately - prices are expected to drop',
+                    '⚠️ Urgent action required to avoid losses',
+                    '🔄 Consider alternative markets if available'
+                ];
+            }
+            
+            recommendations.innerHTML = recommendationTexts.map(text => `
+                <div class="flex items-start space-x-3 p-3 bg-white rounded-lg">
+                    <p class="text-sm text-gray-700">${text}</p>
+                </div>
+            `).join('');
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98447a49a56447c4',t:'MTc1ODczOTkzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
